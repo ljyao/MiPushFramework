@@ -27,16 +27,16 @@ public class ConfigCenter {
 
         try {
 
-            SharedPreferences prefs = PreferencesUtils.getPreferences(ctx);
-            tmp.autoRegister = prefs.getBoolean(PreferencesUtils.AUTO_REGISTER, tmp.autoRegister);
-            tmp.foregroundNotification = prefs.getBoolean(PreferencesUtils.KEY_FOREGROUND_NOTIFICATION, tmp.foregroundNotification);
-
-            {
-                String mode = prefs.getString(PreferencesUtils.KEY_ACCESS_MODE, "0");
-                tmp.accessMode = Integer.valueOf(mode);
-            }
-
-            conf = tmp;
+//            SharedPreferences prefs = PreferencesUtils.getPreferences(ctx);
+//            tmp.autoRegister = prefs.getBoolean(PreferencesUtils.AUTO_REGISTER, tmp.autoRegister);
+//            tmp.foregroundNotification = prefs.getBoolean(PreferencesUtils.KEY_FOREGROUND_NOTIFICATION, tmp.foregroundNotification);
+//
+//            {
+//                String mode = prefs.getString(PreferencesUtils.KEY_ACCESS_MODE, "0");
+//                tmp.accessMode = Integer.valueOf(mode);
+//            }
+//
+//            conf = tmp;
             return true;
         } catch (RuntimeException e) {
             Log4a.e(TAG, e);
