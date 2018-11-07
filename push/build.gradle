@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
+//apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -17,14 +17,14 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        def fabricKey = null
-        if (project.rootProject.file('local.properties').exists()) {
-            Properties properties = new Properties()
-            properties.load(project.rootProject.file('local.properties').newDataInputStream())
-            fabricKey = properties.getProperty('FABRIC_KEY')
-        }
-        manifestPlaceholders = [fabricKey: fabricKey != null ?
-                fabricKey : System.getenv("FABRIC_KEY")]
+//        def fabricKey = null
+//        if (project.rootProject.file('local.properties').exists()) {
+//            Properties properties = new Properties()
+//            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+//            fabricKey = properties.getProperty('FABRIC_KEY')
+//        }
+//        manifestPlaceholders = [fabricKey: fabricKey != null ?
+//                fabricKey : System.getenv("FABRIC_KEY")]
 
         ndk {
             abiFilters 'armeabi', 'armeabi-v7a', 'x86'
@@ -77,6 +77,11 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions{
+        doNotStrip '*/mips/*.so'
+        doNotStrip '*/mips64/*.so'
     }
 }
 

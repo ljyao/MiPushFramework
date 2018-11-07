@@ -9,7 +9,7 @@ import com.taobao.android.dexposed.XC_MethodHook;
 import com.taobao.android.dexposed.XC_MethodReplacement;
 import com.xiaomi.push.service.PushConstants;
 import com.xiaomi.push.service.PushServiceConstants;
-import com.xiaomi.push.service.PushServiceMain;
+import com.xiaomi.xmsf.push.service.PushServiceMain;
 import com.xiaomi.push.service.timers.Alarm;
 import com.xiaomi.xmsf.push.hooks.IHook;
 
@@ -44,7 +44,7 @@ public class HookPingReceiver implements IHook {
                                 Intent serviceIntent = new Intent(context, PushServiceMain.class);
                                 serviceIntent.putExtra(PushServiceConstants.EXTRA_TIME_STAMP, System.currentTimeMillis());
                                 serviceIntent.setAction(PushServiceConstants.ACTION_TIMER);
-                                context.startService(serviceIntent);
+                                context.startForegroundService(serviceIntent);
                             } catch (Throwable e) {
                                 Log4a.e(TAG, e);
                             }

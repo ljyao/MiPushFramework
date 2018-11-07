@@ -24,7 +24,6 @@
 
     </PreferenceCategory>
 
-    <!--
     <PreferenceCategory android:title="@string/settings_enhance">
 
         <SwitchPreference
@@ -34,7 +33,6 @@
             android:title="@string/settings_debug_foreground_notification" />
 
     </PreferenceCategory>
-    -->
 
     <PreferenceCategory android:title="@string/settings_debug">
 

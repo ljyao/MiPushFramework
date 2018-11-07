@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2011 The Android Open Source Project
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2011 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -17,70 +16,74 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:columnCount="2"
+    android:duplicateParentState="true"
+    android:gravity="top"
     android:minHeight="72dp"
     android:paddingTop="16dp"
-    android:paddingBottom="16dp"
-    android:gravity="top"
-    android:columnCount="2"
-    android:duplicateParentState="true">
+    android:paddingBottom="16dp">
 
     <ImageView
         android:id="@android:id/icon"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="center"
-        android:scaleType="fitXY"
         android:layout_marginRight="16dip"
         android:contentDescription="@null"
-        android:duplicateParentState="true" />
+        android:duplicateParentState="true"
+        android:scaleType="fitXY" />
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@android:id/icon">
+        android:layout_toRightOf="@android:id/icon"
+        android:orientation="vertical">
+
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <TextView
                 android:id="@android:id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
+                android:duplicateParentState="true"
                 android:ellipsize="marquee"
-                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textAlignment="viewStart"
                 android:gravity="start"
-                android:duplicateParentState="true" />
+                android:singleLine="true"
+                android:textAlignment="viewStart"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:textColor="?android:attr/textColorPrimary" />
 
             <TextView
                 android:id="@android:id/text2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:layout_gravity="end|top"/>
+                android:layout_gravity="end|top"
+                android:textSize="12sp" />
         </FrameLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-        <TextView
-            android:id="@android:id/summary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            android:singleLine="true"
-            android:ellipsize="marquee"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:textColor="?android:attr/textColorSecondary"
-            android:duplicateParentState="true" />
+
+            <TextView
+                android:id="@android:id/summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:duplicateParentState="true"
+                android:ellipsize="marquee"
+                android:gravity="end"
+                android:singleLine="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:textColor="?android:attr/textColorSecondary" />
+
             <TextView
                 android:id="@+id/text_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:layout_gravity="end|top"/>
+                android:layout_gravity="end|top"
+                android:textSize="12sp" />
         </FrameLayout>
     </LinearLayout>
 

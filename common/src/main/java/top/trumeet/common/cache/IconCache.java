@@ -20,7 +20,7 @@ public class IconCache {
 
     private IconCache() {
         int maxMemory = (int) Runtime.getRuntime().maxMemory();
-        int cacheSizes = maxMemory / 5;
+        int cacheSizes = maxMemory;
         mIconMemoryCaches = new LruCache<>(cacheSizes);
         //TODO check cacheSizes is correct ?
     }
@@ -59,21 +59,10 @@ public class IconCache {
             @Override
             Bitmap gen() {
                 Bitmap rawIconBitmap = getRawIconBitmap(ctx, pkg);
-                if (rawIconBitmap == null) {
-                    return null;
-                }
-
-                //scaleImage to 64dp
-                int dip2px = dip2px(ctx, 64);
-                return ImgUtils.scaleImage(ImgUtils.convertToTransparentAndWhite(rawIconBitmap), dip2px, dip2px);
+                return rawIconBitmap == null ? null : ImgUtils.convertToTransparentAndWhite(rawIconBitmap);
             }
         }.get("white_" + pkg);
     }
 
-
-    public static int dip2px(Context context, float dipValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dipValue * scale + 0.5f);
-    }
 
 }

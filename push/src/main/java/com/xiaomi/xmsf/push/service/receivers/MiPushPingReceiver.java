@@ -7,8 +7,7 @@ import android.text.TextUtils;
 
 import com.xiaomi.channel.commonutils.logger.MyLog;
 import com.xiaomi.push.service.PushConstants;
-import com.xiaomi.push.service.PushServiceConstants;
-import com.xiaomi.push.service.PushServiceMain;
+import com.xiaomi.xmsf.push.service.PushServiceMain;
 import com.xiaomi.push.service.timers.Alarm;
 
 public class MiPushPingReceiver extends BroadcastReceiver {
@@ -25,9 +24,9 @@ public class MiPushPingReceiver extends BroadcastReceiver {
 
                 try {
                     Intent localIntent = new Intent(paramContext, PushServiceMain.class);
-                    localIntent.putExtra(PushServiceConstants.EXTRA_TIME_STAMP, System.currentTimeMillis());
-                    localIntent.setAction(PushServiceConstants.ACTION_TIMER);
-                    paramContext.startService(localIntent);
+                    localIntent.putExtra("time_stamp", System.currentTimeMillis());
+                    localIntent.setAction("com.xiaomi.push.timer");
+                    paramContext.startForegroundService(localIntent);
                 } catch (Exception localException) {
                     MyLog.e(localException);
                 }

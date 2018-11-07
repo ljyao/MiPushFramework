@@ -53,7 +53,7 @@ import top.trumeet.common.register.RegisteredApplication;
 public class MyClientEventDispatcher extends ClientEventDispatcher {
     private static final String TAG = "MyClientEventDispatcher";
 
-    MyClientEventDispatcher() {
+    public MyClientEventDispatcher() {
         try {
             // Patch mPushEventProcessor
             Field mPushEventProcessorField = ClientEventDispatcher.class

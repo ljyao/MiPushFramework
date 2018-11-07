@@ -9,7 +9,7 @@ import com.taobao.android.dexposed.XC_MethodHook;
 import com.taobao.android.dexposed.XC_MethodReplacement;
 import com.xiaomi.push.service.GeoFenceUtils;
 import com.xiaomi.push.service.PushServiceConstants;
-import com.xiaomi.push.service.PushServiceMain;
+import com.xiaomi.xmsf.push.service.PushServiceMain;
 import com.xiaomi.xmsf.push.hooks.IHook;
 
 import java.util.Collections;
@@ -41,7 +41,7 @@ public class HookPkgUninstallReceiver implements IHook {
                                         Intent serviceIntent = new Intent(context, PushServiceMain.class);
                                         serviceIntent.setAction(PushServiceConstants.ACTION_UNINSTALL);
                                         serviceIntent.putExtra(PushServiceConstants.EXTRA_UNINSTALL_PKG_NAME, data.getEncodedSchemeSpecificPart());
-                                        context.startService(serviceIntent);
+                                        context.startForegroundService(serviceIntent);
                                         GeoFenceUtils.appIsUninstalled(context.getApplicationContext(), data.getEncodedSchemeSpecificPart());
                                     } catch (Throwable e) {
                                         Log4a.e(TAG, "Hook", e);

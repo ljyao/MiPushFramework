@@ -10,7 +10,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
-import com.xiaomi.push.service.PushServiceMain;
 import com.xiaomi.xmsf.R;
 import com.xiaomi.xmsf.push.auth.AuthActivity;
 import com.xiaomi.xmsf.push.control.PushControllerUtils;
@@ -89,7 +88,7 @@ public class XMPushService extends IntentService {
                         intent2.setComponent(new ComponentName(this, PushServiceMain.class));
                         intent2.setAction(intent.getAction());
                         intent2.putExtras(intent);
-                        startService(intent2);
+                        startForegroundService(intent2);
                         if (application.getType() == RegisteredApplication.Type.ALLOW_ONCE) {
                             Log4a.w(TAG, "Return once to ask");
                             application.setType(RegisteredApplication.Type.ASK);
@@ -99,7 +98,7 @@ public class XMPushService extends IntentService {
                     }
                 }
             }
-            if (register) {
+            if (false && register) {
                 if (application != null && application.isNotificationOnRegister()) {
                     try {
                         CharSequence appName = getPackageManager().getApplicationLabel(getPackageManager().getApplicationInfo(pkg, 0));
@@ -129,7 +128,8 @@ public class XMPushService extends IntentService {
                                 }
                             });
                         }
-                    } catch (PackageManager.NameNotFoundException ignored) {}
+                    } catch (PackageManager.NameNotFoundException ignored) {
+                    }
                 } else {
                     Log.e("XMPushService Bridge", "Notification disabled");
                 }

@@ -40,7 +40,7 @@ public class ConfigCenter {
             return true;
         } catch (RuntimeException e) {
             Log4a.e(TAG, e);
-            Toast.makeText(ctx, ctx.getString(R.string.log_push_err)  + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(ctx, ctx.getString(R.string.log_push_err)  + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             return false;
         }
     }

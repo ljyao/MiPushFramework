@@ -1,4 +1,4 @@
-package com.xiaomi.push.sdk;
+package com.xiaomi.xmsf.push.service;
 
 import android.app.IntentService;
 import android.content.ComponentName;

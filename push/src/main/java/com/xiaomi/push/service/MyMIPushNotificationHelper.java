@@ -235,7 +235,7 @@ public class MyMIPushNotificationHelper {
             localPendingIntent = PendingIntent.getService(paramContext, id, localIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         } else {
             Intent localIntent = new Intent();
-            localIntent.setComponent(new ComponentName("com.xiaomi.xmsf", "com.xiaomi.push.sdk.MyPushMessageHandler"));
+            localIntent.setComponent(new ComponentName("com.xiaomi.xmsf", "com.xiaomi.xmsf.push.service.MyPushMessageHandler"));
             localIntent.putExtra(PushConstants.MIPUSH_EXTRA_PAYLOAD, paramArrayOfByte);
             localIntent.putExtra(MIPushNotificationHelper.FROM_NOTIFICATION, true);
             localIntent.addCategory(String.valueOf(paramPushMetaInfo.getNotifyId()));

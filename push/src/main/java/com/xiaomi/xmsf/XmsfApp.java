@@ -16,6 +16,7 @@ import android.os.Build;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.oasisfeng.condom.CondomOptions;
@@ -150,7 +151,6 @@ public class XmsfApp extends Application {
         } catch (RuntimeException e) {
             Log4a.e(TAG , e.getLocalizedMessage(), e);
         }
-
     }
 
     private void initPushLogger() {
@@ -164,6 +164,9 @@ public class XmsfApp extends Application {
 
             @Override
             public void log(String content, Throwable t) {
+                t.printStackTrace();
+                Log.d("lll",t.getMessage());
+
                 if (t == null) {
                     Log4a.i(TAG, content);
                 } else {
@@ -173,6 +176,8 @@ public class XmsfApp extends Application {
 
             @Override
             public void log(String content) {
+                Log.d("lll",content);
+
                 Log4a.d(TAG, content);
             }
         });
@@ -188,11 +193,15 @@ public class XmsfApp extends Application {
 
             @Override
             public void log(String content) {
+                Log.d("lll",content);
+
                 Log4a.d(M_TAG, content);
             }
 
             @Override
             public void log(String content, Throwable t) {
+                Log.d("lll",content);
+
                 if (content.contains("isMIUI")) {
                     return;
                 }
@@ -275,5 +284,4 @@ public class XmsfApp extends Application {
             MyLog.e(th);
         }
     }
-
 }
