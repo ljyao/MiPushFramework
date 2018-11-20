@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ResolveInfo;
+import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 
 import com.xiaomi.channel.commonutils.android.AppInfoUtils;
@@ -133,6 +134,7 @@ public class MyMIPushMessageProcessor {
     private static void userProcessMIPushMessage(XMPushService paramXMPushService, XmPushActionContainer buildContainer, byte[] paramArrayOfByte, long var2, Intent paramIntent, boolean isGeoMessage) {
         //var5 buildContainer
         //var6 metaInfo
+        boolean shouldNotify = true;
 
         boolean pkgInstalled = AppInfoUtils.isPkgInstalled(paramXMPushService, buildContainer.packageName);
         if (!pkgInstalled) {
@@ -180,10 +182,15 @@ public class MyMIPushMessageProcessor {
                 if (TextUtils.isEmpty(description)) {
                     metaInfo.setDescription(paramXMPushService.getString(R.string.see_pass_though_msg));
                 }
+
+                if (isDupTextMsg(targetPackage, title, description)) {
+                    Log4a.w(TAG, "drop a duplicate message, judge by text from : " + buildContainer.packageName);
+                    shouldNotify = false;
+                }
             }
+
         }
 
-        boolean notified = false;
         if (metaInfo != null && !TextUtils.isEmpty(metaInfo.getTitle()) && !TextUtils.isEmpty(metaInfo.getDescription())) {
 
             String var8 = null;
@@ -199,7 +206,9 @@ public class MyMIPushMessageProcessor {
                 Log4a.w(TAG, "drop a duplicate message, key=" + var8);
             } else {
 
-                MyMIPushNotificationHelper.notifyPushMessage(paramXMPushService, buildContainer, paramArrayOfByte, var2);
+                if (shouldNotify) {
+                    MyMIPushNotificationHelper.notifyPushMessage(paramXMPushService, buildContainer, paramArrayOfByte, var2);
+                }
 
                 //send broadcast
                 if (!MIPushNotificationHelper.isBusinessMessage(buildContainer)) {
@@ -234,6 +243,40 @@ public class MyMIPushMessageProcessor {
 
         }
 
+    }
+
+
+    private static LruCache<String, CacheItem> cacheInstance = new LruCache<>(15);
+
+    private static class CacheItem {
+        String title; String content; long time;
+
+        CacheItem(String title, String content, long time) {
+            this.title = title;
+            this.content = content;
+            this.time = time;
+        }
+    }
+    private static boolean isDupTextMsg(String packageName, String title, String content) {
+        if (TextUtils.isEmpty(title) || TextUtils.isEmpty(content)) {
+            return false;
+        }
+        long currentTimeMillis = System.currentTimeMillis();
+        CacheItem cached = cacheInstance.get(packageName);
+        boolean isDup = false;
+
+        if (cached != null) {
+            if (TextUtils.equals(title + content, cached.title + cached.content)) {
+                if ((currentTimeMillis - cached.time) < (60 * 1000)) {
+                    isDup = true;
+                }
+            }
+        }
+        if (!isDup) {
+            cacheInstance.put(packageName, new CacheItem(title, content, currentTimeMillis));
+        }
+
+        return isDup;
     }
 
 }

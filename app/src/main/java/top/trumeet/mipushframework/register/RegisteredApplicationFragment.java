@@ -13,18 +13,22 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -36,7 +40,6 @@ import top.trumeet.common.register.RegisteredApplication;
 import top.trumeet.mipush.BuildConfig;
 import top.trumeet.mipush.R;
 import top.trumeet.mipushframework.utils.MiPushManifestChecker;
-import top.trumeet.mipushframework.utils.ThreadUtils;
 import top.trumeet.mipushframework.widgets.Footer;
 import top.trumeet.mipushframework.widgets.FooterItemBinder;
 
@@ -123,9 +126,6 @@ public class RegisteredApplicationFragment extends Fragment implements SwipeRefr
 
         private Context context;
 
-        private MiPushManifestChecker checker = null;
-
-
         private class Result {
             private final int notUseMiPushCount;
             private final List<RegisteredApplication> list;
@@ -146,6 +146,7 @@ public class RegisteredApplicationFragment extends Fragment implements SwipeRefr
             }
             Set<String> actuallyRegisteredPkgs = EventDb.queryRegistered(context, mSignal);
 
+            MiPushManifestChecker checker = null;
             try {
                 checker = MiPushManifestChecker.create(context);
             } catch (PackageManager.NameNotFoundException | ClassNotFoundException e) {
@@ -154,56 +155,60 @@ public class RegisteredApplicationFragment extends Fragment implements SwipeRefr
 
             List<RegisteredApplication> res = new Vector<>();
 
+            int threadCount = Runtime.getRuntime().availableProcessors();
+            ExecutorService pool = new ThreadPoolExecutor(
+                    threadCount,
+                    threadCount * 2,
+                    1,
+                    TimeUnit.SECONDS,
+                    new ArrayBlockingQueue<>(10), new ThreadPoolExecutor.CallerRunsPolicy());
 
-            ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
+            final AtomicInteger notUseMiPushCount = new AtomicInteger();
+            final List<PackageInfo> packageInfos = context.getPackageManager().getInstalledPackages(PackageManager.GET_DISABLED_COMPONENTS | PackageManager.GET_SERVICES | PackageManager.GET_RECEIVERS);
 
-            final AtomicInteger notUseMiPushCount = new AtomicInteger(0);
-            for (PackageInfo tinfo : context.getPackageManager().getInstalledPackages(PackageManager.GET_DISABLED_COMPONENTS|
-                    PackageManager.GET_SERVICES | PackageManager.GET_RECEIVERS)) {
+            for (PackageInfo packageInfo : packageInfos) {
 
-                final PackageInfo info = tinfo;
-                executorService.submit(() -> {
-                    if (info.services == null) {
-                        info.services = new ServiceInfo[]{};
-                    }
-                    if (info.packageName.equals(SERVICE_APP_NAME) || info.packageName.equals(BuildConfig.APPLICATION_ID)) {
+                final PackageInfo info = packageInfo;
+                MiPushManifestChecker finalChecker = checker;
+
+                pool.submit(() -> {
+                    String currentAppPkgName = info.packageName;
+                    if (info.services == null) info.services = new ServiceInfo[]{};
+                    if (TextUtils.equals(SERVICE_APP_NAME, currentAppPkgName) ||
+                            TextUtils.equals(BuildConfig.APPLICATION_ID, currentAppPkgName)) {
                         return;
                     }
-                    System.out.println("Not Registered:: " + info.packageName);
-                    RegisteredApplication application;
-                    if (registeredPkgs.containsKey(info.packageName)) {
-                        System.out.println("Reg Pkg Con " + info.packageName);
-                        application = registeredPkgs.get(info.packageName);
-                        if (actuallyRegisteredPkgs.contains(info.packageName)) {
-                            application.setRegisteredType(1);
-                        } else {
-                            application.setRegisteredType(2);
-                        }
+
+                    if (registeredPkgs.containsKey(currentAppPkgName)) {
+                        RegisteredApplication application = registeredPkgs.get(currentAppPkgName);
+                        application.setRegisteredType(actuallyRegisteredPkgs.contains(currentAppPkgName) ? 1 : 2);
+                        res.add(application);
                     } else {
-                        System.out.println("Reg Pkg NoCon " + info.packageName);
-                        if (checker != null) {
+                        if (finalChecker != null && finalChecker.checkServices(info)) {
                             // checkReceivers will use Class#forName, but we can't change our classloader to target app's.
-                            if (!checker.checkServices(info)) {
-                                notUseMiPushCount.incrementAndGet();
-                                System.out.println("Not MiPush " + info.packageName);
-                                return;
-                            }
+                            RegisteredApplication application = new RegisteredApplication();
+                            application.setPackageName(currentAppPkgName);
+                            application.setRegisteredType(0);
+                            res.add(application);
                         } else {
-                            notUseMiPushCount.incrementAndGet();
-                            return;
+                            Log.i(TAG, "not use mipush : " + currentAppPkgName);
+                            notUseMiPushCount.addAndGet(1);
                         }
-                        application = new RegisteredApplication();
-                        application.setPackageName(info.packageName);
-                        application.setRegisteredType(0);
                     }
-                    System.out.println("Not registered: " + application.getPackageName() + ": " + application.getPackageName());
-                    res.add(application);
                 });
             }
 
-
-            ThreadUtils.shutdownAndAwaitTermination(executorService, 2, TimeUnit.MINUTES);
-
+            pool.shutdown();
+            try {
+                if (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
+                    pool.shutdownNow(); // Cancel currently executing tasks
+                    if (!pool.awaitTermination(60, TimeUnit.SECONDS))
+                        System.err.println("Pool did not terminate");
+                }
+            } catch (InterruptedException ie) {
+                pool.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
 
             return new Result(notUseMiPushCount.get(), res);
         }
