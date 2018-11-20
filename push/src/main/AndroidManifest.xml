@@ -67,7 +67,8 @@
             android:exported="true"
             android:process=":pushservice" />
         <service
-            android:name="com.xiaomi.push.service.PushServiceMain"
+            android:name=".push.service.PushServiceMain"
+            android:enabled="true"
             android:exported="true"
             android:process=":pushservice"
             tools:ignore="ExportedService" />
@@ -164,7 +165,7 @@
         <service
             android:name=".push.service.MiuiPushActivateService"
             android:exported="true" />
-        <service android:name="com.xiaomi.push.sdk.MyPushMessageHandler" />
+        <service android:name=".push.service.MyPushMessageHandler" />
 
         <activity
             android:name=".push.auth.AuthActivity"
@@ -219,9 +220,9 @@
             </intent-filter>
         </activity>
 
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="${fabricKey}" />
+        <!--<meta-data-->
+            <!--android:name="io.fabric.ApiKey"-->
+            <!--android:value="${fabricKey}" />-->
 
         <provider
             android:authorities="com.xiaomi.xmsf.push.control.APIProvider"
