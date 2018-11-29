@@ -14,7 +14,6 @@ import moe.shizuku.preference.Preference;
 import moe.shizuku.preference.PreferenceFragment;
 import moe.shizuku.preference.PreferenceGroup;
 import moe.shizuku.preference.SwitchPreferenceCompat;
-import moe.shizuku.preference.TwoStatePreference;
 import top.trumeet.common.Constants;
 import top.trumeet.common.utils.rom.RomUtils;
 import top.trumeet.mipush.R;
@@ -29,8 +28,9 @@ import static top.trumeet.common.utils.rom.RomUtils.ROM_UNKNOWN;
 /**
  * Created by Trumeet on 2017/8/27.
  * Main settings
- * @see MainActivity
+ *
  * @author Trumeet
+ * @see MainActivity
  */
 
 public class SettingsFragment extends PreferenceFragment {
@@ -42,42 +42,25 @@ public class SettingsFragment extends PreferenceFragment {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.settings);
-       setPreferenceOnclick("key_get_log", preference -> {
-           startActivity(new Intent()
-           .setComponent(new ComponentName(Constants.SERVICE_APP_NAME,
-                   Constants.SHARE_LOG_COMPONENT_NAME)));
-           return true;
-       });
-
-       setPreferenceOnclick("key_clear_log", preference -> {
-           startActivity(new Intent()
-           .setComponent(new ComponentName(Constants.SERVICE_APP_NAME,
-                   Constants.CLEAR_LOG_COMPONENT_NAME)));
-           return true;
-       });
+        setPreferenceOnclick("key_get_log", preference -> {
+            startActivity(new Intent()
+                    .setComponent(new ComponentName(Constants.SERVICE_APP_NAME,
+                            Constants.SHARE_LOG_COMPONENT_NAME)));
+            return true;
+        });
 
 
-       setPreferenceOnclick("activity_keep_alive", preference -> {
-           Intent intent = new Intent().setComponent(new ComponentName(Constants.SERVICE_APP_NAME,
-                   Constants.KEEPLIVE_COMPONENT_NAME));
-           intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-           startActivity(intent);
-           return true;
-       });
+        setPreferenceOnclick("activity_keep_alive", preference -> {
+            Intent intent = new Intent().setComponent(new ComponentName(Constants.SERVICE_APP_NAME,
+                    Constants.KEEPLIVE_COMPONENT_NAME));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            return true;
+        });
 
 
-       setPreferenceOnclick("activity_push_icon", preference -> {
-           Intent intent = new Intent().setComponent(new ComponentName(Constants.SERVICE_APP_NAME,
-                   Constants.KEEPLIVE_COMPONENT_NAME));
-           intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-           TwoStatePreference switchPreference = (TwoStatePreference) preference;
-           intent.putExtra(Constants.ENABLE_LAUNCHER, switchPreference.isChecked() ? R.string.enable : R.string.disable);
-           startActivity(intent);
-           return true;
-       });
-
-        String globeFake = Constants.FAKE_CONFIGURATION_GLOBE;
-        addItem(new File(globeFake).exists(), (preference, newValue) -> {
+        String globalFake = Constants.FAKE_CONFIGURATION_GLOBAL;
+        addItem(new File(globalFake).exists(), (preference, newValue) -> {
                     boolean enabled = (boolean) newValue;
 
                     List<String> commands = new ArrayList<>(3);
@@ -91,9 +74,9 @@ public class SettingsFragment extends PreferenceFragment {
 
 
                     if (enabled) {
-                        if (!new File(globeFake).exists()) commands.add("touch " + globeFake);
+                        if (!new File(globalFake).exists()) commands.add("touch " + globalFake);
                     } else {
-                        commands.add("rm " + globeFake);
+                        commands.add("rm " + globalFake);
                     }
 
                     Log.i(TAG, "Final Commands: " + commands.toString());
@@ -103,10 +86,11 @@ public class SettingsFragment extends PreferenceFragment {
                 },
                 "全局" + getString(R.string.fake_enable_title),
                 getString(R.string.fake_enable_detail),
-                getPreferenceScreen().findPreference("activity_push_icon").getParent());
+                getPreferenceScreen().findPreference("activity_keep_alive").getParent()
+        );
 
 
-       checkROM();
+        checkROM();
     }
 
     private void addItem(boolean value, Preference.OnPreferenceChangeListener listener,
@@ -121,19 +105,19 @@ public class SettingsFragment extends PreferenceFragment {
         parent.addPreference(preference);
     }
 
-    private void checkROM () {
+    private void checkROM() {
         cancelTask();
         mTask = new CheckROMTask((result) -> {
             Preference preference = getPreferenceScreen().findPreference("activity_keep_alive");
             if (preference != null) {
                 preference.setVisible(result == ROM_MIUI || result == ROM_H2OS ||
-                result == ROM_UNKNOWN);
+                        result == ROM_UNKNOWN);
             }
         });
         mTask.execute();
     }
 
-    private void cancelTask () {
+    private void cancelTask() {
         if (mTask != null) {
             if (!mTask.isCancelled())
                 mTask.cancel(true);
@@ -142,12 +126,12 @@ public class SettingsFragment extends PreferenceFragment {
     }
 
     private void setPreferenceOnclick(String key, Preference.OnPreferenceClickListener onPreferenceClickListener) {
-          getPreferenceScreen().findPreference(key).setOnPreferenceClickListener(onPreferenceClickListener);
+        getPreferenceScreen().findPreference(key).setOnPreferenceClickListener(onPreferenceClickListener);
 
     }
 
     @Override
-    public void onStart () {
+    public void onStart() {
         super.onStart();
         long time = System.currentTimeMillis();
         Log.d(TAG, "rebuild UI took: " + String.valueOf(System.currentTimeMillis() -
@@ -156,7 +140,7 @@ public class SettingsFragment extends PreferenceFragment {
 
     @FunctionalInterface
     private interface CheckListener {
-        void result (int value);
+        void result(int value);
     }
 
     private class CheckROMTask extends AsyncTask<Void, Void, Integer> {
