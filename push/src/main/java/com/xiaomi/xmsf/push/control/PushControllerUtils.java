@@ -129,9 +129,6 @@ public class PushControllerUtils {
         setPrefsEnable(enable, context);
         setServiceEnable(enable, context);
         setBootReceiverEnable(enable, context);
-
-        //force reload on disable
-        ConfigCenter.reloadConf(context);
     }
 
     /**
