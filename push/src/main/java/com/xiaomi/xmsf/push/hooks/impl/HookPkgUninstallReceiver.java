@@ -9,7 +9,7 @@ import com.taobao.android.dexposed.XC_MethodHook;
 import com.taobao.android.dexposed.XC_MethodReplacement;
 import com.xiaomi.push.service.GeoFenceUtils;
 import com.xiaomi.push.service.PushServiceConstants;
-import com.xiaomi.push.service.PushServiceMain;
+import com.xiaomi.xmsf.push.service.PushServiceMain;
 import com.xiaomi.xmsf.push.hooks.IHook;
 
 import java.util.Collections;

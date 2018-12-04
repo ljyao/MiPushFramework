@@ -68,7 +68,7 @@
             android:exported="true"
             android:process=":pushservice" />
         <service
-            android:name="com.xiaomi.push.service.PushServiceMain"
+            android:name=".push.service.PushServiceMain"
             android:exported="true"
             android:process=":pushservice"
             tools:ignore="ExportedService" />

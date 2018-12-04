@@ -6,7 +6,7 @@ import android.content.Intent;
 
 import com.xiaomi.channel.commonutils.network.Network;
 import com.xiaomi.mipush.sdk.PushServiceClient;
-import com.xiaomi.push.service.PushServiceMain;
+import com.xiaomi.xmsf.push.service.PushServiceMain;
 import com.xiaomi.smack.util.TrafficUtils;
 
 public class NetworkStatusReceiver extends BroadcastReceiver {

@@ -8,7 +8,7 @@ import android.text.TextUtils;
 import com.xiaomi.channel.commonutils.logger.MyLog;
 import com.xiaomi.push.service.PushConstants;
 import com.xiaomi.push.service.PushServiceConstants;
-import com.xiaomi.push.service.PushServiceMain;
+import com.xiaomi.xmsf.push.service.PushServiceMain;
 import com.xiaomi.push.service.timers.Alarm;
 
 public class MiPushPingReceiver extends BroadcastReceiver {

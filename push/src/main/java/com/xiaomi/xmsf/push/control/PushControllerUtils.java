@@ -17,10 +17,9 @@ import android.preference.PreferenceManager;
 import com.oasisfeng.condom.CondomContext;
 import com.xiaomi.mipush.sdk.MiPushClient;
 import com.xiaomi.push.service.PushServiceConstants;
-import com.xiaomi.push.service.PushServiceMain;
+import com.xiaomi.xmsf.push.service.PushServiceMain;
 import com.xiaomi.xmsf.push.service.receivers.BootReceiver;
 import com.xiaomi.xmsf.push.service.receivers.KeepAliveReceiver;
-import com.xiaomi.xmsf.utils.ConfigCenter;
 
 import me.pqpo.librarylog4a.Log4a;
 import top.trumeet.common.Constants;

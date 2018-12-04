@@ -10,7 +10,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
-import com.xiaomi.push.service.PushServiceMain;
 import com.xiaomi.xmsf.R;
 import com.xiaomi.xmsf.push.auth.AuthActivity;
 import com.xiaomi.xmsf.push.control.PushControllerUtils;
