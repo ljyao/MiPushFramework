@@ -62,7 +62,8 @@ public class NotificationController {
                                                                 @NonNull CharSequence name) {
         NotificationChannel channel = new NotificationChannel(getChannelIdByPkg(packageName),
                 name, NotificationManager.IMPORTANCE_DEFAULT);
-        channel.enableVibration(true);
+        channel.enableLights(true);
+        channel.enableVibration(false);
         return channel;
     }
 

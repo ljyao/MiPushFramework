@@ -95,6 +95,8 @@ public class PushServiceMain extends MyXMPushService {
         super.onCreate();
         mSettingsObserver = new SettingsObserver(new Handler(Looper.myLooper()));
 
+        // 首次启动先刷新设置
+        onConfigChanged();
     }
 
     @Override
@@ -107,8 +109,7 @@ public class PushServiceMain extends MyXMPushService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        // 首次启动先刷新设置
-        onConfigChanged();
+
         return Service.START_STICKY;
     }
 
@@ -148,7 +149,7 @@ public class PushServiceMain extends MyXMPushService {
                     .setSmallIcon(R.drawable.ic_notifications_black_24dp)
                     .setPriority(NotificationCompat.PRIORITY_MIN)
                     .setOngoing(true)
-                    .setShowWhen(true)
+                    .setShowWhen(false)
                     .build();
             manager.notify(NOTIFICATION_ALIVE_ID, notification);
             startForeground(NOTIFICATION_ALIVE_ID, notification);

@@ -33,6 +33,7 @@ import me.pqpo.librarylog4a.Log4a;
 import top.trumeet.common.cache.ApplicationNameCache;
 import top.trumeet.common.cache.IconCache;
 
+import static com.xiaomi.push.service.MIPushNotificationHelper.NOTIFY_ALL;
 import static com.xiaomi.push.service.MIPushNotificationHelper.isBusinessMessage;
 
 /**
@@ -91,7 +92,7 @@ public class MyMIPushNotificationHelper {
 //                Log4a.e(TAG, e.getLocalizedMessage(), e);
 //            }
 
-            if (BuildConfig.DEBUG) {
+            if (false && BuildConfig.DEBUG) {
                 int i = R.drawable.ic_notifications_black_24dp;
 
                 PendingIntent pendingIntentOpenActivity = openActivityPendingIntent(var0, buildContainer, metaInfo, var1);
