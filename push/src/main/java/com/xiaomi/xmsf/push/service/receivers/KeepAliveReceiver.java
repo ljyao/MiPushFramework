@@ -6,7 +6,7 @@ import android.content.Intent;
 
 import com.xiaomi.channel.commonutils.logger.MyLog;
 import com.xiaomi.push.service.PushServiceConstants;
-import com.xiaomi.push.service.PushServiceMain;
+import com.xiaomi.xmsf.push.service.PushServiceMain;
 
 import me.pqpo.librarylog4a.Log4a;
 

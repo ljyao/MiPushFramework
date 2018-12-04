@@ -88,7 +88,7 @@ public class XMPushService extends IntentService {
                         intent2.setComponent(new ComponentName(this, PushServiceMain.class));
                         intent2.setAction(intent.getAction());
                         intent2.putExtras(intent);
-                        startForegroundService(intent2);
+                        startService(intent2);
                         if (application.getType() == RegisteredApplication.Type.ALLOW_ONCE) {
                             Log4a.w(TAG, "Return once to ask");
                             application.setType(RegisteredApplication.Type.ASK);
@@ -98,7 +98,7 @@ public class XMPushService extends IntentService {
                     }
                 }
             }
-            if (false && register) {
+            if (register) {
                 if (application != null && application.isNotificationOnRegister()) {
                     try {
                         CharSequence appName = getPackageManager().getApplicationLabel(getPackageManager().getApplicationInfo(pkg, 0));
@@ -128,8 +128,7 @@ public class XMPushService extends IntentService {
                                 }
                             });
                         }
-                    } catch (PackageManager.NameNotFoundException ignored) {
-                    }
+                    } catch (PackageManager.NameNotFoundException ignored) {}
                 } else {
                     Log.e("XMPushService Bridge", "Notification disabled");
                 }

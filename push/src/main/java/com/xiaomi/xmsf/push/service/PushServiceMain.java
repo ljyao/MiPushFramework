@@ -1,4 +1,4 @@
-package com.xiaomi.push.service;
+package com.xiaomi.xmsf.push.service;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -15,6 +15,8 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.oasisfeng.condom.CondomContext;
+import com.xiaomi.push.service.ClientEventDispatcher;
+import com.xiaomi.push.service.MyClientEventDispatcher;
 import com.xiaomi.smack.packet.Message;
 import com.xiaomi.xmpush.thrift.ActionType;
 import com.xiaomi.xmpush.thrift.PushMetaInfo;
@@ -28,7 +30,6 @@ import me.pqpo.librarylog4a.Log4a;
 import static top.trumeet.common.Constants.TAG_CONDOM;
 
 /**
- *
  * @author Trumeet
  * @date 2018/1/19
  * <p>
@@ -89,6 +90,7 @@ public class PushServiceMain extends XMPushService {
         super.onCreate();
         mSettingsObserver = new SettingsObserver(new Handler(Looper.myLooper()));
 
+        onConfigChanged();
     }
 
     @Override
@@ -102,11 +104,10 @@ public class PushServiceMain extends XMPushService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         // 首次启动先刷新设置
-        onConfigChanged();
+        //onConfigChanged();
         return Service.START_STICKY;
     }
 
-    @Override
     public ClientEventDispatcher createClientEventDispatcher() {
         return new MyClientEventDispatcher();
     }
@@ -130,7 +131,7 @@ public class PushServiceMain extends XMPushService {
         }
     }
 
-    private void onConfigChanged () {
+    private void onConfigChanged() {
         NotificationManager manager = (NotificationManager)
                 getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
