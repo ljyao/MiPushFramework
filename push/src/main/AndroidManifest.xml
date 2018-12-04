@@ -69,7 +69,6 @@
             android:process=":pushservice" />
         <service
             android:name=".push.service.PushServiceMain"
-            android:enabled="true"
             android:exported="true"
             android:process=":pushservice"
             tools:ignore="ExportedService" />

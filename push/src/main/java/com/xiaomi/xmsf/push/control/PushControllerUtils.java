@@ -3,9 +3,11 @@ package com.xiaomi.xmsf.push.control;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.job.JobScheduler;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -17,7 +19,7 @@ import com.xiaomi.mipush.sdk.MiPushClient;
 import com.xiaomi.push.service.PushServiceConstants;
 import com.xiaomi.xmsf.push.service.PushServiceMain;
 import com.xiaomi.xmsf.push.service.receivers.BootReceiver;
-import com.xiaomi.xmsf.utils.ConfigCenter;
+import com.xiaomi.xmsf.push.service.receivers.KeepAliveReceiver;
 
 import me.pqpo.librarylog4a.Log4a;
 import top.trumeet.common.Constants;
@@ -36,6 +38,8 @@ import static top.trumeet.common.Constants.TAG_CONDOM;
 @SuppressLint("WrongConstant")
 public class PushControllerUtils {
     private static final String TAG = PushControllerUtils.class.getSimpleName();
+
+    private static BroadcastReceiver liveReceiver  = new KeepAliveReceiver();
 
     private static SharedPreferences getPrefs(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
@@ -94,6 +98,7 @@ public class PushControllerUtils {
         if (enable) {
             Log4a.d(TAG, "Starting...");
 
+
             if (isAppMainProc(context)) {
                 MiPushClient.registerPush(wrapContext(context), APP_ID, APP_KEY);
             }
@@ -102,13 +107,28 @@ public class PushControllerUtils {
                 Intent serviceIntent = new Intent(context, PushServiceMain.class);
                 serviceIntent.putExtra(PushServiceConstants.EXTRA_TIME_STAMP, System.currentTimeMillis());
                 serviceIntent.setAction(PushServiceConstants.ACTION_TIMER);
-                context.startForegroundService(serviceIntent);
+                context.startService(serviceIntent);
+            } catch (Throwable e) {
+                Log4a.e(TAG, e);
+            }
+
+            try {
+                IntentFilter filter = new IntentFilter();
+                filter.addAction(Intent.ACTION_SCREEN_ON);
+                context.registerReceiver(liveReceiver, filter);
             } catch (Throwable e) {
                 Log4a.e(TAG, e);
             }
 
         } else {
             Log4a.d(TAG, "Stopping...");
+
+            try {
+                context.unregisterReceiver(liveReceiver);
+            } catch (Throwable e) {
+                Log4a.e(TAG, e);
+            }
+
             MiPushClient.unregisterPush(wrapContext(context));
             // Force stop and disable services.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

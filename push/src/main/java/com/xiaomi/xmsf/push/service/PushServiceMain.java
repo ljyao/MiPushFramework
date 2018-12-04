@@ -17,6 +17,10 @@ import android.util.Log;
 import com.oasisfeng.condom.CondomContext;
 import com.xiaomi.push.service.ClientEventDispatcher;
 import com.xiaomi.push.service.MyClientEventDispatcher;
+import com.xiaomi.push.service.MyXMPushService;
+import com.xiaomi.push.service.PacketSync;
+import com.xiaomi.push.service.PushConstants;
+import com.xiaomi.push.service.XMPushService;
 import com.xiaomi.smack.packet.Message;
 import com.xiaomi.xmpush.thrift.ActionType;
 import com.xiaomi.xmpush.thrift.PushMetaInfo;
@@ -30,6 +34,7 @@ import me.pqpo.librarylog4a.Log4a;
 import static top.trumeet.common.Constants.TAG_CONDOM;
 
 /**
+ *
  * @author Trumeet
  * @date 2018/1/19
  * <p>
@@ -37,19 +42,19 @@ import static top.trumeet.common.Constants.TAG_CONDOM;
  * 具体转换： {@link com.xiaomi.xmpush.thrift.XmPushThriftSerializeUtils#convertByteArrayToThriftObject(TBase, byte[])} 中。
  * <p>
  * 0. 万恶之源
- * 主要 intent 处理是在 {@link XMPushService#handleIntent(Intent)}
+ * 主要 intent 处理是在 {@link com.xiaomi.push.service.XMPushService#handleIntent(Intent)}
  * <p>
  * 1. 向服务器发送
- * <strong>向服务器</strong>发送消息是 {@link XMPushService#sendMessage(Intent)}（解析 Intent -> Package）
+ * <strong>向服务器</strong>发送消息是 {@link com.xiaomi.push.service.XMPushService#sendMessage(Intent)}（解析 Intent -> Package）
  * 对应服务启动方：{@link com.xiaomi.push.service.ServiceClient#sendMessage(Message, boolean)}
  * Action: {@link PushConstants#ACTION_SEND_MESSAGE}
  * Extras: {@link PushConstants#MIPUSH_EXTRA_PAYLOAD}, {@link PushConstants#MIPUSH_EXTRA_MESSAGE_CACHE}, {@link PushConstants#MIPUSH_EXTRA_APP_PACKAGE}
  * <p>
- * {@link XMPushService#sendMessage(String, byte[], boolean)}（解析 payload (byte[]）-> 未知）
+ * {@link com.xiaomi.push.service.XMPushService#sendMessage(String, byte[], boolean)}（解析 payload (byte[]）-> 未知）
  * 对应启动方： {@link com.xiaomi.mipush.sdk.PushServiceClient#sendMessage(TBase, ActionType, PushMetaInfo)}
  * Action: {@link PushConstants#MIPUSH_ACTION_SEND_MESSAGE}
  * <p>
- * {@link XMPushService#sendMessages(Intent)}（和第一个一样，批量）
+ * {@link com.xiaomi.push.service.XMPushService#sendMessages(Intent)}（和第一个一样，批量）
  * 对应启动方： {@link com.xiaomi.push.service.ServiceClient#batchSendMessage(Message[], boolean)}
  * Action: {@link PushConstants#ACTION_BATCH_SEND_MESSAGE}
  * <p>
@@ -57,13 +62,13 @@ import static top.trumeet.common.Constants.TAG_CONDOM;
  * {@link com.xiaomi.mipush.sdk.PushServiceClient}。
  * <p>
  * 看具体的 Job（{@link com.xiaomi.push.service.SendMessageJob}， {@link com.xiaomi.push.service.BatchSendMessageJob}），
- * 都是 {@link XMPushService} 收到 Intent 之后，启动 job，然后 job 回掉 XMPushService 进行 send packet，然后应该是发送给服务器了..
- * 所以这里的发送消息是通过 {@link XMPushService} 向服务器发送 Packet / Blob。
+ * 都是 {@link com.xiaomi.push.service.XMPushService} 收到 Intent 之后，启动 job，然后 job 回掉 XMPushService 进行 send packet，然后应该是发送给服务器了..
+ * 所以这里的发送消息是通过 {@link com.xiaomi.push.service.XMPushService} 向服务器发送 Packet / Blob。
  * <p>
  * 2. 本地发送
  * 根据发送消息中出错的 Stacktrace，我们可以轻松找出发送消息的下游处理。
- * 首先，在 {@link XMPushService#connectBySlim} 连接时，注册了包监听器 {@link XMPushService#mPacketListener}。
- * 它在监听到 Blob 和 Packet 后启动 {@link BlobReceiveJob} 和 {@link PacketReceiveJob}。
+ * 首先，在 {@link com.xiaomi.push.service.XMPushService#connectBySlim} 连接时，注册了包监听器 {@link com.xiaomi.push.service.XMPushService#mPacketListener}。
+ * 它在监听到 Blob 和 Packet 后启动 {@link com.xiaomi.push.service.XMPushService.BlobReceiveJob} 和 {@link com.xiaomi.push.service.XMPushService.PacketReceiveJob}。
  * 这两个 Job 都将数据交给 {@link PacketSync} 处理。但两者最后都经过检测 / 处理，将数据交给 {@link ClientEventDispatcher#notifyPacketArrival} 处理。
  * <p>
  * 3. 其他
@@ -72,11 +77,11 @@ import static top.trumeet.common.Constants.TAG_CONDOM;
  * 监听解决方案：
  * 所有包都会经过 {@link com.xiaomi.smack.PacketListener}，官方有一个处理器（C00621），持有在非静态 Field mPacketListener 中。
  * 所以我们只需创造一个自己的 {@link ClientEventDispatcher}，重写相关方法，即可完成处理。
- * 这种方式相比自己反射修改 {@link com.xiaomi.smack.PacketListener}，更优雅（无需反射，同时小米为我们提供了 {@link XMPushService#createClientEventDispatcher()} 方法），
+ * 这种方式相比自己反射修改 {@link com.xiaomi.smack.PacketListener}，更优雅（无需反射，同时小米为我们提供了 {@link com.xiaomi.push.service.XMPushService#createClientEventDispatcher()} 方法），
  * 同时还能通过官方提供的处理逻辑（{@link PacketSync}），直接处理消息通知包。
  */
 
-public class PushServiceMain extends XMPushService {
+public class PushServiceMain extends MyXMPushService {
     private static final String TAG = "PushService";
 
     public static final String CHANNEL_STATUS = "status";
@@ -90,7 +95,6 @@ public class PushServiceMain extends XMPushService {
         super.onCreate();
         mSettingsObserver = new SettingsObserver(new Handler(Looper.myLooper()));
 
-        onConfigChanged();
     }
 
     @Override
@@ -104,12 +108,8 @@ public class PushServiceMain extends XMPushService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         // 首次启动先刷新设置
-        //onConfigChanged();
+        onConfigChanged();
         return Service.START_STICKY;
-    }
-
-    public ClientEventDispatcher createClientEventDispatcher() {
-        return new MyClientEventDispatcher();
     }
 
     @Override
@@ -131,7 +131,7 @@ public class PushServiceMain extends XMPushService {
         }
     }
 
-    private void onConfigChanged() {
+    private void onConfigChanged () {
         NotificationManager manager = (NotificationManager)
                 getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
