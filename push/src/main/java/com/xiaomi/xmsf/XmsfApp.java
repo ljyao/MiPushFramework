@@ -18,7 +18,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
 import com.oasisfeng.condom.CondomOptions;
 import com.oasisfeng.condom.CondomProcess;
 import com.taobao.android.dexposed.XC_MethodHook;
@@ -35,13 +34,11 @@ import com.xiaomi.xmsf.push.notification.NotificationController;
 import com.xiaomi.xmsf.push.service.MiuiPushActivateService;
 import com.xiaomi.xmsf.push.service.notificationcollection.NotificationListener;
 import com.xiaomi.xmsf.push.service.notificationcollection.UploadNotificationJob;
-import com.xiaomi.xmsf.utils.ConfigCenter;
 import com.xiaomi.xmsf.utils.LogUtils;
 
 import java.util.HashSet;
 import java.util.Random;
 
-import io.fabric.sdk.android.Fabric;
 import me.pqpo.librarylog4a.Log4a;
 import top.trumeet.common.Constants;
 import top.trumeet.common.push.PushServiceAccessibility;
@@ -78,13 +75,6 @@ public class XmsfApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        if (!BuildConfig.DEBUG) {
-            final Fabric fabric = new Fabric.Builder(this)
-                    .kits(new Crashlytics())
-                    .build();
-            Fabric.with(fabric);
-        }
 
         LogUtils.configureLog(this);
 

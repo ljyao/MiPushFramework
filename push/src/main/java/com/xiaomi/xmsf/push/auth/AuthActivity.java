@@ -82,9 +82,9 @@ public class AuthActivity extends Activity {
 
         application.setType(type);
         // DB operation in UI thread, too bad
-        RegisteredApplicationDb.update(application, this);
-        startService(new Intent(this, com.xiaomi.xmsf.push.service.XMPushService.class)
-                .putExtra(EXTRA_MI_PUSH_PACKAGE, application.getPackageName()));
+//        RegisteredApplicationDb.update(application, this);
+//        startService(new Intent(this, com.xiaomi.xmsf.push.service.XMPushService.class)
+//                .putExtra(EXTRA_MI_PUSH_PACKAGE, application.getPackageName()));
         finish();
     }
 }

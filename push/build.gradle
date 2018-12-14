@@ -8,14 +8,13 @@ android {
     defaultConfig {
         applicationId "com.xiaomi.xmsf"
         minSdkVersion rootProject.ext.minSdkVersion
+        multiDexEnabled true
         // Keep alive
         targetSdkVersion 26
         // XMPush sdk requires XMPushService not exported, but sdk will start exported XMPushService after
         // XMSF version code 106. SDK will also check version code must >= 105.
         versionCode 105
         versionName rootProject.ext.versionName + "_framework"
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
 //        def fabricKey = null
 //        if (project.rootProject.file('local.properties').exists()) {
@@ -27,7 +26,7 @@ android {
 //                fabricKey : System.getenv("FABRIC_KEY")]
 
         ndk {
-            abiFilters 'armeabi', 'armeabi-v7a', 'x86'
+            abiFilters 'armeabi-v7a'
         }
     }
 
@@ -93,9 +92,6 @@ dependencies {
     })
     // Hook
     implementation 'me.weishu:epic:0.3.6'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation project(':common')
     implementation project(':condom')
     implementation "com.android.support:support-v4:$supportLibraryVersion"
@@ -103,9 +99,4 @@ dependencies {
     implementation project(':extenders')
     implementation "com.android.support:palette-v7:$supportLibraryVersion"
     compileOnly 'de.robv.android.xposed:api:82'
-
-    // Fabric
-    implementation('com.crashlytics.sdk.android:crashlytics:2.8.0@aar') {
-        transitive = true
-    }
 }

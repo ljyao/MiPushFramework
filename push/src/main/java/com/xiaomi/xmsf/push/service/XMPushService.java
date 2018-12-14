@@ -9,7 +9,6 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.xiaomi.xmsf.R;
 import com.xiaomi.xmsf.push.auth.AuthActivity;
 import com.xiaomi.xmsf.push.control.PushControllerUtils;
@@ -23,8 +22,6 @@ import top.trumeet.common.db.EventDb;
 import top.trumeet.common.db.RegisteredApplicationDb;
 import top.trumeet.common.event.Event;
 import top.trumeet.common.register.RegisteredApplication;
-
-import static com.xiaomi.xmsf.BuildConfig.DEBUG;
 
 public class XMPushService extends IntentService {
     private static final String TAG = "XMPushService Bridge";
@@ -57,7 +54,6 @@ public class XMPushService extends IntentService {
                 result = Event.ResultType.DENY_DISABLED;
             } else {
                 if (application == null) {
-                    if (!DEBUG) Crashlytics.log(Log.WARN, TAG, "registerApplication failed " + pkg);
                     Log4a.w(TAG, "registerApplication failed " + pkg);
                     return;
                 }
@@ -115,7 +111,7 @@ public class XMPushService extends IntentService {
                                 typeString = null;
                                 break;
                         }
-                        if (typeString != null) {
+                        if (false && typeString != null) {
                             new Handler(Looper.getMainLooper()).post(() -> {
                                 try {
                                     Toast.makeText(this, getString(R.string.notification_register,
@@ -128,7 +124,8 @@ public class XMPushService extends IntentService {
                                 }
                             });
                         }
-                    } catch (PackageManager.NameNotFoundException ignored) {}
+                    } catch (PackageManager.NameNotFoundException ignored) {
+                    }
                 } else {
                     Log.e("XMPushService Bridge", "Notification disabled");
                 }
@@ -136,7 +133,7 @@ public class XMPushService extends IntentService {
             }
         } catch (RuntimeException e) {
             Log4a.e(TAG, "XMPushService::onHandleIntent: ", e);
-            Toast.makeText(this, getString(R.string.common_err, e.getMessage()), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, getString(R.string.common_err, e.getMessage()), Toast.LENGTH_SHORT).show();
         }
     }
 
